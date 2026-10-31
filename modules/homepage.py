@@ -2,11 +2,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-
 from add_view import show_add_form, show_diseases, Disease
 
-# Import our Search page so the homepage can display it.
-from search_details import show_search_page
 
 BG_COLOR = "#F5F4ED"
 DARK_GREEN = "#234B3A"
@@ -19,7 +16,6 @@ BORDER_COLOR = "#DCE4DA"
 
 # Sample Disease Records
 disease_records = [
-    # Each Disease object stores the eight disease fields.
     Disease(
         "D001",
         "Tomato",
@@ -323,14 +319,6 @@ def open_homepage():
             show_dashboard
         )
 
-        # Display Member 2's Search page in the existing content area.
-    def open_search():
-        show_search_page(
-            content,
-            disease_records,
-            show_dashboard
-        )
-
     # Placeholder Pages
     def show_placeholder(feature):
         clear_content()
@@ -363,7 +351,7 @@ def open_homepage():
     menu_items = [
         ("Dashboard", show_dashboard),
         ("Add Disease", open_add),
-        ("Search Disease", open_search),
+        ("Search Disease", lambda: show_placeholder("Search Disease")),
         ("Update Disease", lambda: show_placeholder("Update Disease")),
         ("Delete Disease", lambda: show_placeholder("Delete Disease")),
         ("Analysis", lambda: show_placeholder("Analysis"))
