@@ -1,221 +1,301 @@
-
 import tkinter as tk
 from tkinter import messagebox
 
-# Application colors
+
+# Colors used for the Update Disease window
 BG_COLOR = "#F5F4ED"
 DARK_GREEN = "#234B3A"
 ACCENT_GREEN = "#527D60"
 WHITE = "#FFFFFF"
 TEXT_COLOR = "#34483A"
 
-# Allowed category and severity values
+
+# Allowed values for category and severity
 SEVERITY_VALUES = ("Low", "Medium", "High")
-CATEGORY_VALUES = ("Fungal", "Bacterial", "Viral", "Pest")
+CATEGORY_VALUES = ("Fungal", "Bacterial", "Viral", "Other")
 
 
-# Record management functions
-
+# Find a disease from the list using its Disease ID
 def find_disease(diseases, disease_id):
-    """Find a disease record by its ID."""
     for record in diseases:
-        if record["disease_id"] == disease_id:
+        if record.disease_id.lower() == disease_id.lower():
             return record
+
     return None
 
 
-def update_disease_record(record, plant_name, disease_name, category, severity, cause, symptoms, treatment):
-    """Update the values of an existing disease record."""
-    record["plant_name"] = plant_name
-    record["disease_name"] = disease_name
-    record["category"] = category
-    record["severity"] = severity
-    record["cause"] = cause
-    record["symptoms"] = symptoms
-    record["treatment"] = treatment
+# Update the existing disease object's information
+def update_disease_record(record, plant_name, disease_name, category,
+                          severity, cause, symptoms, treatment):
+
+    record.plant_name = plant_name
+    record.disease_name = disease_name
+    record.category = category
+    record.severity = severity
+    record.cause = cause
+    record.symptoms = symptoms
+    record.treatment = treatment
 
 
-# Update Disease GUI
-
+# Create the Update Disease window
 def open_update_window(parent, diseases, on_update=None):
-    """Open the Update Disease window."""
 
     win = tk.Toplevel(parent)
     win.title("Update Disease")
-    win.geometry("540x580")
+    win.geometry("540x650")
     win.configure(bg=BG_COLOR)
+    win.resizable(False, False)
 
-    current_record = {"data": None}
+    current_record = {"record": None}
 
-    # Window heading
-    tk.Label(win, text="Update Disease", font=("Segoe UI", 20, "bold"),
-             bg=BG_COLOR, fg=DARK_GREEN).pack(pady=(15, 5))
+    # Heading of the window
+    tk.Label(
+        win,
+        text="Update Disease",
+        font=("Segoe UI", 20, "bold"),
+        bg=BG_COLOR,
+        fg=DARK_GREEN
+    ).pack(pady=15)
 
-    tk.Label(win, text="Enter Disease ID to fetch and modify record details.",
-             font=("Segoe UI", 10), bg=BG_COLOR, fg=TEXT_COLOR).pack()
-
-    # Disease ID search section
     search_frame = tk.Frame(win, bg=BG_COLOR)
-    search_frame.pack(pady=10)
+    search_frame.pack(fill="x", padx=25, pady=5)
 
-    tk.Label(search_frame, text="Disease ID:", font=("Segoe UI", 10, "bold"),
-             bg=BG_COLOR, fg=TEXT_COLOR).pack(side="left", padx=5)
+    tk.Label(
+        search_frame,
+        text="Enter Disease ID:",
+        font=("Segoe UI", 11, "bold"),
+        bg=BG_COLOR,
+        fg=TEXT_COLOR
+    ).pack(anchor="w")
 
-    id_entry = tk.Entry(search_frame, font=("Segoe UI", 10), width=18)
-    id_entry.pack(side="left", padx=5)
+    id_entry = tk.Entry(search_frame, font=("Segoe UI", 11), width=35)
+    id_entry.pack(side="left", pady=8)
 
-    # Input fields
-    form_frame = tk.Frame(win, bg=WHITE, padx=15, pady=15)
-    form_frame.pack(pady=10, fill="x", padx=20)
+    form_frame = tk.Frame(win, bg=WHITE, padx=20, pady=15)
+    form_frame.pack(fill="both", expand=True, padx=25, pady=10)
 
-    def create_entry():
-        return tk.Entry(
+    # These fields will store the updated disease information
+    fields = {}
+    field_names = [
+        "Plant Name",
+        "Disease Name",
+        "Category",
+        "Severity",
+        "Cause",
+        "Symptoms",
+        "Treatment"
+    ]
+
+    # Create an input box for each field
+    for field in field_names:
+        tk.Label(
+            form_frame,
+            text=field,
+            font=("Segoe UI", 10, "bold"),
+            bg=WHITE,
+            fg=TEXT_COLOR
+        ).pack(anchor="w", pady=(5, 0))
+
+        entry = tk.Entry(
             form_frame,
             font=("Segoe UI", 10),
             width=50,
-            relief="solid",
             bd=2,
-            highlightthickness=1,
-            highlightbackground="#A0A0A0",
-            highlightcolor=DARK_GREEN
+            relief="solid"
         )
+        entry.pack(fill="x", pady=3)
 
-    tk.Label(form_frame, text="Plant Name:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    plant_entry = create_entry()
-    plant_entry.pack(pady=(0, 5))
+        fields[field] = entry
 
-    tk.Label(form_frame, text="Disease Name:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    name_entry = create_entry()
-    name_entry.pack(pady=(0, 5))
-
-    tk.Label(form_frame, text="Category:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    category_entry = create_entry()
-    category_entry.pack(pady=(0, 5))
-
-    tk.Label(form_frame, text="Severity:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    severity_entry = create_entry()
-    severity_entry.pack(pady=(0, 5))
-
-    tk.Label(form_frame, text="Cause:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    cause_entry = create_entry()
-    cause_entry.pack(pady=(0, 5))
-
-    tk.Label(form_frame, text="Symptoms:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    symptoms_entry = create_entry()
-    symptoms_entry.pack(pady=(0, 5))
-
-    tk.Label(form_frame, text="Treatment:", font=("Segoe UI", 9, "bold"),
-             bg=WHITE, fg=TEXT_COLOR).pack(anchor="w")
-    treatment_entry = create_entry()
-    treatment_entry.pack(pady=(0, 5))
-
-    # Clear all input fields
+    # Remove all existing information from the input fields
     def clear_form():
-        plant_entry.delete(0, tk.END)
-        name_entry.delete(0, tk.END)
-        category_entry.delete(0, tk.END)
-        severity_entry.delete(0, tk.END)
-        cause_entry.delete(0, tk.END)
-        symptoms_entry.delete(0, tk.END)
-        treatment_entry.delete(0, tk.END)
+        for entry in fields.values():
+            entry.delete(0, tk.END)
 
     # Fetch an existing disease record
     def fetch_record():
-        current_record["data"] = None
-        clear_form()
-
         disease_id = id_entry.get().strip()
 
-        if disease_id == "":
-            messagebox.showerror("Error", "Please enter a Disease ID.")
+        current_record["record"] = None
+        clear_form()
+
+        if not disease_id:
+            messagebox.showwarning(
+                "Missing ID",
+                "Please enter a Disease ID.",
+                parent=win
+            )
             return
 
+        # Find the matching disease from the shared disease list
         record = find_disease(diseases, disease_id)
 
         if record is None:
-            messagebox.showerror("Error", "Record not found.")
-            current_record["data"] = None
-            clear_form()
+            messagebox.showerror(
+                "Not Found",
+                "No disease record found with this ID.",
+                parent=win
+            )
             return
 
-        current_record["data"] = record
+        current_record["record"] = record
 
-        plant_entry.insert(0, record["plant_name"])
-        name_entry.insert(0, record["disease_name"])
-        category_entry.insert(0, record["category"])
-        severity_entry.insert(0, record["severity"])
-        cause_entry.insert(0, record["cause"])
-        symptoms_entry.insert(0, record["symptoms"])
-        treatment_entry.insert(0, record["treatment"])
+        # Display the existing information in the input fields
+        fields["Plant Name"].insert(0, record.plant_name)
+        fields["Disease Name"].insert(0, record.disease_name)
+        fields["Category"].insert(0, record.category)
+        fields["Severity"].insert(0, record.severity)
+        fields["Cause"].insert(0, record.cause)
+        fields["Symptoms"].insert(0, record.symptoms)
+        fields["Treatment"].insert(0, record.treatment)
 
-        messagebox.showinfo("Loaded", "Record found and loaded successfully.")
+        messagebox.showinfo(
+            "Record Found",
+            "Disease information loaded successfully.",
+            parent=win
+        )
 
-    # Validate and save updated disease details
+    # Save the updated disease information
     def save_update():
-        record = current_record["data"]
+
+        # Make sure a disease has been selected first
+        record = current_record["record"]
 
         if record is None:
-            messagebox.showerror("Error", "Please fetch a valid record first.")
+            messagebox.showwarning(
+                "No Record",
+                "Please fetch a disease record first.",
+                parent=win
+            )
             return
 
-        plant = plant_entry.get().strip()
-        disease_name = name_entry.get().strip()
-        category = category_entry.get().strip()
-        severity = severity_entry.get().strip()
-        cause = cause_entry.get().strip()
-        symptoms = symptoms_entry.get().strip()
-        treatment = treatment_entry.get().strip()
+        values = {
+            field: entry.get().strip()
+            for field, entry in fields.items()
+        }
 
-        if not all([plant, disease_name, category, severity, cause, symptoms, treatment]):
-            messagebox.showerror("Error", "All fields are required.")
+        # Check whether any field is empty
+        if any(value == "" for value in values.values()):
+            messagebox.showwarning(
+                "Missing Information",
+                "Please fill in all fields.",
+                parent=win
+            )
             return
 
-        if category not in CATEGORY_VALUES:
-            messagebox.showerror("Error", "Invalid Category. Allowed: " + ", ".join(CATEGORY_VALUES))
+        # Check whether the category is valid
+        if values["Category"] not in CATEGORY_VALUES:
+            messagebox.showwarning(
+                "Invalid Category",
+                "Category must be Fungal, Bacterial, Viral, or Other.",
+                parent=win
+            )
             return
 
-        if severity not in SEVERITY_VALUES:
-            messagebox.showerror("Error", "Invalid Severity. Allowed: " + ", ".join(SEVERITY_VALUES))
+        # Check whether the severity is valid
+        if values["Severity"] not in SEVERITY_VALUES:
+            messagebox.showwarning(
+                "Invalid Severity",
+                "Severity must be Low, Medium, or High.",
+                parent=win
+            )
             return
 
-        update_disease_record(record, plant, disease_name, category, severity, cause, symptoms, treatment)
+        # Check whether another record has the same plant and disease name
+        for existing_record in diseases:
+            if existing_record is not record:
+                if (
+                    existing_record.plant_name.lower() == values["Plant Name"].lower()
+                    and existing_record.disease_name.lower() == values["Disease Name"].lower()
+                ):
+                    messagebox.showwarning(
+                        "Duplicate Record",
+                        "This plant and disease combination already exists.",
+                        parent=win
+                    )
+                    return
 
-        messagebox.showinfo("Success", "Record updated successfully!")
+        # Update the selected object with the new information
+        update_disease_record(
+            record,
+            values["Plant Name"],
+            values["Disease Name"],
+            values["Category"],
+            values["Severity"],
+            values["Cause"],
+            values["Symptoms"],
+            values["Treatment"]
+        )
 
-        id_entry.delete(0, tk.END)
+        messagebox.showinfo(
+            "Success",
+            "Disease information updated successfully.",
+            parent=win
+        )
+
         clear_form()
-        current_record["data"] = None
+        id_entry.delete(0, tk.END)
+        current_record["record"] = None
 
-        if on_update is not None:
+        if on_update:
             on_update()
 
-    # Action buttons
-    tk.Button(search_frame, text="Fetch Record", width=12, command=fetch_record,
-              bg=ACCENT_GREEN, fg=WHITE, font=("Segoe UI", 9, "bold")).pack(side="left", padx=5)
+    # Button to search and load an existing disease record
+    tk.Button(
+        search_frame,
+        text="Fetch Record",
+        command=fetch_record,
+        bg=ACCENT_GREEN,
+        fg=WHITE,
+        font=("Segoe UI", 10, "bold")
+    ).pack(side="left", padx=10)
 
-    tk.Button(win, text="Save Updates", width=18, command=save_update,
-              bg=DARK_GREEN, fg=WHITE, font=("Segoe UI", 10, "bold")).pack(pady=10)
+    # Button to save the updated disease information
+    tk.Button(
+        win,
+        text="Save Updates",
+        command=save_update,
+        bg=DARK_GREEN,
+        fg=WHITE,
+        font=("Segoe UI", 11, "bold"),
+        width=20
+    ).pack(pady=12)
 
 
-# Standalone testing
+
+# Creates sample records for testing the Update Disease window
 if __name__ == "__main__":
-    sample_records = [
-        {"disease_id": "D001", "plant_name": "Tomato", "disease_name": "Early Blight",
-         "category": "Fungal", "severity": "High", "cause": "Fungus",
-         "symptoms": "Brown spots", "treatment": "Use fungicide"},
 
-        {"disease_id": "D002", "plant_name": "Potato", "disease_name": "Late Blight",
-         "category": "Fungal", "severity": "Medium", "cause": "Fungus",
-         "symptoms": "Dark leaves", "treatment": "Remove infected leaves"}
+    class Disease:
+        def __init__(self, disease_id, plant_name, disease_name, category,
+                     severity, cause, symptoms, treatment):
+            self.disease_id = disease_id
+            self.plant_name = plant_name
+            self.disease_name = disease_name
+            self.category = category
+            self.severity = severity
+            self.cause = cause
+            self.symptoms = symptoms
+            self.treatment = treatment
+
+    # Temporary sample records for standalone testing
+    disease_records = [
+        Disease(
+            "D001", "Tomato", "Early Blight", "Fungal", "Medium",
+            "Alternaria solani fungus",
+            "Brown spots on older leaves",
+            "Remove infected leaves and apply suitable fungicide."
+        ),
+        Disease(
+            "D002", "Potato", "Late Blight", "Fungal", "High",
+            "Phytophthora infestans",
+            "Dark patches on leaves and stems",
+            "Remove infected plants and use suitable fungicide."
+        )
     ]
 
+    # Create the main Tkinter window and open the update window
     root = tk.Tk()
     root.withdraw()
-    open_update_window(root, sample_records)
+    open_update_window(root, disease_records)
     root.mainloop()
