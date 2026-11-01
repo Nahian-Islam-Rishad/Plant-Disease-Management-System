@@ -286,7 +286,19 @@ def show_search_page(parent, records, go_dashboard):
             )
             return
 
+         # Read the values stored in the selected table row.
         selected_values = tree.item(selected_items[0], "values")
+
+        # Stop safely if the selected row has no stored values.
+        if not selected_values:
+            messagebox.showwarning(
+                "Invalid Selection",
+                "Please search again and select a valid disease.",
+                parent=parent
+            )
+            return
+
+        # Find the disease using the ID in the first column.
         record = find_disease(records, selected_values[0])
 
         if record is None:
