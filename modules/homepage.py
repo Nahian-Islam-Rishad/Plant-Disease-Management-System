@@ -22,7 +22,7 @@ BORDER_COLOR = '#DCE4DA'
 
 # Store the initial disease information in a list.
 # Each Disease object contains eight attributes.
-# All modules use this same list to access and modify records.
+# All modules use this same list to access and modify records..
 disease_records = [
     Disease('D001', 'Tomato', 'Early Blight', 'Fungal', 'Medium',
             'Alternaria solani fungus', 'Brown spots on older leaves',
