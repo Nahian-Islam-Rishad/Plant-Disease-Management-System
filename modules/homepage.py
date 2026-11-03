@@ -8,7 +8,7 @@ from add_view import Disease, show_add_form, show_diseases
 from search_details import show_search_page
 from update import open_update_window
 from delete import open_delete_window
-from analyse import show_analysis
+from analysis import show_analysis
 
 
 # Define common colors to maintain a consistent design.
