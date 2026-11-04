@@ -1,7 +1,11 @@
 
+# 1. Import Libraries
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+
+# 2. GUI Colors
 
 BG_COLOR = "#F5F4ED"
 DARK_GREEN = "#234B3A"
@@ -10,6 +14,8 @@ WHITE = "#FFFFFF"
 TEXT_COLOR = "#34483A"
 BORDER_COLOR = "#DCE4DA"
 
+
+# 3. Disease Class
 
 class Disease:
     def __init__(
@@ -33,83 +39,114 @@ class Disease:
         self.treatment = treatment
 
 
+# 4. Clear Page Function
+
 def clear_page(parent):
     for widget in parent.winfo_children():
         widget.destroy()
 
 
-def show_add_form(parent, records, go_dashboard):
-    clear_page(parent)
+# 5. Add Class
 
-    heading = tk.Label(
-        parent,
-        text="Add New Disease",
-        font=("Segoe UI", 20, "bold"),
-        bg=BG_COLOR,
-        fg=DARK_GREEN
-    )
-    heading.pack(anchor="w", pady=(0, 20))
+class Add:
 
-    form_frame = tk.Frame(parent, bg=BG_COLOR)
-    form_frame.pack(fill="x", anchor="w")
+    # 5.1 Constructor
+    def __init__(self, parent, records, go_dashboard):
+        self.parent = parent
+        self.records = records
+        self.go_dashboard = go_dashboard
+        self.fields = {}
 
-    fields = {}
+    # 5.2 Add Disease GUI
+    def show_form(self):
 
-    field_names = [
-        "Plant Name",
-        "Disease Name",
-        "Category",
-        "Severity",
-        "Cause",
-        "Symptoms",
-        "Treatment"
-    ]
+        clear_page(self.parent)
 
-    for field in field_names:
-        label = tk.Label(
-            form_frame,
-            text=field,
-            font=("Segoe UI", 10, "bold"),
+        heading = tk.Label(
+            self.parent,
+            text="Add New Disease",
+            font=("Segoe UI", 20, "bold"),
             bg=BG_COLOR,
-            fg=TEXT_COLOR
+            fg=DARK_GREEN
         )
-        label.pack(anchor="w", pady=(5, 3))
+        heading.pack(anchor="w", pady=(0, 20))
 
-        if field == "Category":
-            widget = ttk.Combobox(
+        form_frame = tk.Frame(self.parent, bg=BG_COLOR)
+        form_frame.pack(fill="x", anchor="w")
+
+        self.fields = {}
+
+        field_names = [
+            "Plant Name",
+            "Disease Name",
+            "Category",
+            "Severity",
+            "Cause",
+            "Symptoms",
+            "Treatment"
+        ]
+
+        for field in field_names:
+            label = tk.Label(
                 form_frame,
-                values=["Fungal", "Bacterial", "Viral", "Other"],
-                state="readonly",
-                width=45
+                text=field,
+                font=("Segoe UI", 10, "bold"),
+                bg=BG_COLOR,
+                fg=TEXT_COLOR
             )
+            label.pack(anchor="w", pady=(5, 3))
 
-        elif field == "Severity":
-            widget = ttk.Combobox(
-                form_frame,
-                values=["Low", "Medium", "High"],
-                state="readonly",
-                width=45
-            )
+            if field == "Category":
+                widget = ttk.Combobox(
+                    form_frame,
+                    values=["Fungal", "Bacterial", "Viral", "Other"],
+                    state="readonly",
+                    width=45
+                )
 
-        else:
-            widget = ttk.Entry(
-                form_frame,
-                width=48
-            )
+            elif field == "Severity":
+                widget = ttk.Combobox(
+                    form_frame,
+                    values=["Low", "Medium", "High"],
+                    state="readonly",
+                    width=45
+                )
 
-        widget.pack(anchor="w", pady=(0, 5))
-        fields[field] = widget
+            else:
+                widget = ttk.Entry(
+                    form_frame,
+                    width=48
+                )
 
-    def save_disease():
+            widget.pack(anchor="w", pady=(0, 5))
+            self.fields[field] = widget
+
+        ttk.Button(
+            self.parent,
+            text="Save Disease",
+            command=self.save_disease
+        ).pack(anchor="w", pady=(15, 5))
+
+        ttk.Button(
+            self.parent,
+            text="Back to Dashboard",
+            command=self.go_dashboard
+        ).pack(anchor="w", pady=5)
+
+    # 5.3 Save Disease Using Try Except
+    def save_disease(self):
+
         try:
-            plant_name = fields["Plant Name"].get().strip()
-            disease_name = fields["Disease Name"].get().strip()
-            category = fields["Category"].get().strip()
-            severity = fields["Severity"].get().strip()
-            cause = fields["Cause"].get().strip()
-            symptoms = fields["Symptoms"].get().strip()
-            treatment = fields["Treatment"].get().strip()
+            # 5.4 Get Input Values
+            plant_name = self.fields["Plant Name"].get().strip()
+            disease_name = self.fields["Disease Name"].get().strip()
+            category = self.fields["Category"].get().strip()
+            severity = self.fields["Severity"].get().strip()
+            cause = self.fields["Cause"].get().strip()
+            symptoms = self.fields["Symptoms"].get().strip()
+            treatment = self.fields["Treatment"].get().strip()
 
+            # 5.5 Check Empty Fields
             if not all([
                 plant_name,
                 disease_name,
@@ -125,6 +162,7 @@ def show_add_form(parent, records, go_dashboard):
                 )
                 return
 
+            # 5.6 Validate Category
             if category not in ["Fungal", "Bacterial", "Viral", "Other"]:
                 messagebox.showwarning(
                     "Invalid Category",
@@ -132,6 +170,7 @@ def show_add_form(parent, records, go_dashboard):
                 )
                 return
 
+            # 5.7 Validate Severity
             if severity not in ["Low", "Medium", "High"]:
                 messagebox.showwarning(
                     "Invalid Severity",
@@ -139,7 +178,8 @@ def show_add_form(parent, records, go_dashboard):
                 )
                 return
 
-            for record in records:
+            # 5.8 Check Duplicate Records
+            for record in self.records:
                 if (
                     record.plant_name.lower() == plant_name.lower()
                     and record.disease_name.lower() == disease_name.lower()
@@ -150,7 +190,10 @@ def show_add_form(parent, records, go_dashboard):
                     )
                     return
 
-            existing_ids = [record.disease_id for record in records]
+            # 5.9 Generate Disease ID
+            existing_ids = [
+                record.disease_id for record in self.records
+            ]
 
             number = 1
             while f"D{number:03d}" in existing_ids:
@@ -158,6 +201,7 @@ def show_add_form(parent, records, go_dashboard):
 
             disease_id = f"D{number:03d}"
 
+            # 5.10 Create Disease Object
             new_disease = Disease(
                 disease_id,
                 plant_name,
@@ -169,43 +213,60 @@ def show_add_form(parent, records, go_dashboard):
                 treatment
             )
 
-            records.append(new_disease)
+            # 5.11 Add Disease to Records
+            self.records.append(new_disease)
 
             messagebox.showinfo(
                 "Success",
                 "Disease record added successfully!"
             )
 
-            go_dashboard()
+            self.go_dashboard()
 
+        # 5.12 Handle Missing Dictionary Keys
+        except KeyError:
+            messagebox.showerror(
+                "Input Error",
+                "A required field could not be found."
+            )
+
+        # 5.13 Handle Invalid Data Types
+        except TypeError:
+            messagebox.showerror(
+                "Type Error",
+                "Invalid data type found."
+            )
+
+        # 5.14 Handle Invalid Values
         except ValueError:
             messagebox.showerror(
                 "Input Error",
                 "Please enter valid information."
             )
 
+        # 5.15 Handle Other Exceptions
         except Exception as error:
             messagebox.showerror(
                 "Error",
                 f"Something went wrong: {error}"
             )
 
-    ttk.Button(
-        parent,
-        text="Save Disease",
-        command=save_disease
-    ).pack(anchor="w", pady=(15, 5))
 
-    ttk.Button(
-        parent,
-        text="Back to Dashboard",
-        command=go_dashboard
-    ).pack(anchor="w", pady=5)
+# 6. Show Add Form Function
 
+def show_add_form(parent, records, go_dashboard):
+
+    add = Add(parent, records, go_dashboard)
+    add.show_form()
+
+
+# 7. Show Diseases Function
 
 def show_diseases(parent, records, go_dashboard, show_view_button=False):
+
     clear_page(parent)
 
+    # 7.1 View Diseases Heading
     heading = tk.Label(
         parent,
         text="View Diseases",
@@ -215,6 +276,7 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
     )
     heading.pack(anchor="w", pady=(0, 15))
 
+    # 7.2 Total Disease Count
     count_label = tk.Label(
         parent,
         text=f"Total Disease Records: {len(records)}",
@@ -224,11 +286,11 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
     )
     count_label.pack(anchor="w", pady=(0, 10))
 
-    # Top toolbar
+    # 7.3 Top Toolbar
     toolbar = tk.Frame(parent, bg=BG_COLOR)
     toolbar.pack(fill="x", pady=(0, 8))
 
-    # Disease table
+    # 7.4 Disease Table
     table_frame = tk.Frame(parent, bg=WHITE)
     table_frame.pack(fill="both", expand=True)
 
@@ -245,6 +307,7 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
         tree.heading(column, text=column)
         tree.column(column, width=125)
 
+    # 7.5 Table Scrollbar
     scrollbar = ttk.Scrollbar(
         table_frame,
         orient="vertical",
@@ -256,6 +319,7 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
     tree.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
 
+    # 7.6 Insert Disease Records
     for record in records:
         tree.insert(
             "",
@@ -269,7 +333,9 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
             )
         )
 
+    # 7.7 View Disease Details
     def view_details():
+
         selected_item = tree.selection()
 
         if not selected_item:
@@ -306,7 +372,7 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
                 )
                 return
 
-    # Show button only when requested by Dashboard
+    # 7.8 View Details Button
     if show_view_button:
         ttk.Button(
             toolbar,
@@ -314,6 +380,7 @@ def show_diseases(parent, records, go_dashboard, show_view_button=False):
             command=view_details
         ).pack(side="right")
 
+    # 7.9 Back to Dashboard Button
     ttk.Button(
         parent,
         text="Back to Dashboard",
